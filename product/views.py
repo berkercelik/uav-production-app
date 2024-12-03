@@ -107,17 +107,6 @@ def produce_part(request):
 
     return render(request, 'produce_part.html', {'aircraft_models': aircraft_models})
 
-# def home(request):
-#     if request.user.is_authenticated:
-#         # Kullanıcı giriş yapmışsa farklı bir şablon göster
-#         return render(request, 'users/dashboard.html', {'user': request.user})
-#     else:
-#         # Giriş yapmamış kullanıcılar için varsayılan anasayfa
-#         listed_aircrafts = Assembly.objects.filter(is_listed=True)
-
-#         # Veriyi home.html şablonuna gönder
-#         return render(request, 'home.html', {'listed_aircrafts': listed_aircrafts})
-
 def home(request):
     if request.user.is_authenticated:
         # Kullanıcı giriş yapmışsa farklı bir şablon göster
@@ -174,6 +163,7 @@ class ListPartsView(APIView):
                 "part_type": part.part_type,
                 "part_name": part.part_name,
                 "aircraft_model": part.aircraft_model.name,  # Aircraft model adı
+                "quantity": part.quantity,
             }
             for part in parts
         ]
@@ -208,7 +198,7 @@ class ProducePartView(APIView):
         try:
             aircraft_model = AircraftModel.objects.get(id=aircraft_model)
         except AircraftModel.DoesNotExist:
-            return Response({"message": "Geçersiz uçak modeli."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": "Geçersiz hava aracı modeli."}, status=status.HTTP_400_BAD_REQUEST)
         
         team = Team.objects.get(id=team_id)
         if not team.can_manage_parts:
@@ -239,16 +229,16 @@ class ProducePartView(APIView):
 
 class AircraftProductionView(APIView):
     def post(self, request, *args, **kwargs):
-        # Gelen uçak modeli ID'si
+        # Gelen Hava Aracı modeli ID'si
         aircraft_model_id = request.data.get("aircraft_model_id")
 
-        # Uçak modelini kontrol et
+        # Hava Aracı modelini kontrol et
         try:
             aircraft_model = AircraftModel.objects.get(id=aircraft_model_id)
         except AircraftModel.DoesNotExist:
-            return Response({"message": "Geçersiz uçak modeli."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": "Geçersiz Hava Aracı modeli."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Uçak modeline uygun parçaların isimleri
+        # Hava Aracı modeline uygun parçaların isimleri
         required_part_names = [
             f"{aircraft_model.name} Kanadı",
             f"{aircraft_model.name} Gövdesi",
@@ -290,7 +280,7 @@ class AircraftProductionView(APIView):
         assembly.save()
 
         return Response(
-            {"message": "Uçak başarıyla üretildi ve kaydedildi."},
+            {"message": "Hava Aracı başarıyla üretildi ve kaydedildi."},
             status=status.HTTP_200_OK,
         )
 
@@ -316,9 +306,9 @@ class AircraftListView(APIView):
             assembly = Assembly.objects.get(id=aircraft_id)
             assembly.is_listed = True  # Uçağı listele
             assembly.save()
-            return Response({"message": "Uçak başarıyla listeye alındı."}, status=status.HTTP_200_OK)
+            return Response({"message": "Hava Aracı başarıyla listeye alındı."}, status=status.HTTP_200_OK)
         except Assembly.DoesNotExist:
-            return Response({"message": "Uçak bulunamadı."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"message": "Hava Aracı bulunamadı."}, status=status.HTTP_404_NOT_FOUND)
 
 class AircraftRemoveView(APIView):
     def post(self, request, *args, **kwargs):
@@ -327,8 +317,8 @@ class AircraftRemoveView(APIView):
             assembly = Assembly.objects.get(id=aircraft_id)
             assembly.is_listed = False  # Uçağı yayından kaldır
             assembly.save()
-            return Response({"message": "Uçak başarıyla yayından kaldırıldı."}, status=status.HTTP_200_OK)
+            return Response({"message": "Hava Aracı başarıyla yayından kaldırıldı."}, status=status.HTTP_200_OK)
         except Assembly.DoesNotExist:
-            return Response({"message": "Uçak bulunamadı."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"message": "Hava Aracı bulunamadı."}, status=status.HTTP_404_NOT_FOUND)
 
 

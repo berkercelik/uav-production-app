@@ -16,7 +16,7 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
-        <a class="navbar-brand" href="/">Anasayfa</a>
+        <a class="navbar-brand" href="/">Ana Sayfa</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -95,9 +95,9 @@
                 </select>
             </div>
 
-            <!-- Uçak Modeli -->
+            <!-- Hava Aracı Modeli -->
             <div class="mb-3">
-                <label for="aircraft_model" class="form-label">Uçak Modeli</label>
+                <label for="aircraft_model" class="form-label">Hava Aracı Modeli</label>
                 <select id="aircraft_model" name="aircraft_model" class="form-select" disabled>
                     <option value="">-- Seçiniz --</option>
                     <option value="1">TB2</option>
@@ -133,9 +133,9 @@
 
     <div class="container mt-5">
         <div class="child w-100">
-            <!-- Uçak Modeli Seçim Bölümü -->
+            <!-- Hava Aracı Modeli Seçim Bölümü -->
             <div id="aircraft-selection">
-                <h3 class="mb-3">Uçak Modeli Seçin</h3>
+                <h3 class="mb-3">Hava Aracı Modeli Seçin</h3>
                 <div class="form-group">
                     <label for="aircraft-model-select">Hava Aracı Modeli</label>
                     <select id="aircraft-model-select" class="form-control">
@@ -150,10 +150,10 @@
                 </div>
             </div>
             
-            <!-- Uçak Listesi -->
+            <!-- Hava Aracı Listesi -->
             <div id="aircraft-list" class="mt-5 row">
                 <div class="col-12">
-                    <h4 class="mb-3">Uçaklar</h4>
+                    <h4 class="mb-3">Hava Araçları</h4>
                 </div>
             </div>
         </div>
@@ -169,12 +169,12 @@
         const userTeamId = parseInt(teamInfoDiv.getAttribute("data-team-id")); // Takım ID'sini al
 
         const aircraftProductionDiv = document.getElementById("aircraft-selection");
-        const aircraftListDiv = document.getElementById("aircraft-list"); // Uçakların listeleneceği div
+        const aircraftListDiv = document.getElementById("aircraft-list"); // Hava Araçlarının listeleneceği div
         //#endregion
     
         //#region Montaj Takımı için Hava Aracı Listeleme
         
-        // Eğer kullanıcı id'si 5 (montaj takımı) değilse, üretim butonunu ve uçak listesine dair her şeyi gizle
+        // Eğer kullanıcı id'si 5 (montaj takımı) değilse, üretim butonunu ve hava aracı listesine dair her şeyi gizle
         if (userTeamId !== 5) {
             aircraftProductionDiv.style.display = "none";
             aircraftListDiv.style.display = "none"; // Eğer montaj takımı değilse listeyi gizle
@@ -184,11 +184,11 @@
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
             return csrfToken;
             }
-            // Kullanıcı montaj takımıysa, uçakları listele
+            // Kullanıcı montaj takımıysa, listele
             fetch('/dashboard/api/aircraft/')
         .then(response => response.json())
         .then(data => {
-            const aircraftListDiv = document.getElementById("aircraft-list"); // Uçakların listeleneceği div
+            const aircraftListDiv = document.getElementById("aircraft-list"); // Hava araçlarının listeleneceği div
 
             if (data.assemblies && data.assemblies.length > 0) {
                 data.assemblies.forEach(assembly => {
@@ -233,16 +233,16 @@
             } else {
                 aircraftListDiv.innerHTML = `
                     <div class="col-12 text-center">
-                        <p class="text-muted">Henüz üretilen uçak yok.</p>
+                        <p class="text-muted">Henüz üretilen hava aracı yok.</p>
                     </div>
                 `;
             }
         })
         .catch(error => {
-            console.error("Uçakları getirirken bir hata oluştu:", error);
+            console.error("Hava araçlarını getirirken bir hata oluştu:", error);
             aircraftListDiv.innerHTML = `
                 <div class="col-12 text-center">
-                    <p class="text-danger">Uçaklar listelenemedi. Lütfen tekrar deneyin.</p>
+                    <p class="text-danger">Hava Araçları listelenemedi. Lütfen tekrar deneyin.</p>
                 </div>
             `;
         });
@@ -250,7 +250,7 @@
                 
             });
 
-            // Uçak listeleme işlemi (backend ile iletişim kurarak uçakları listele)
+            // Hava Aracı listeleme işlemi (backend ile iletişim kurarak hava araçlarını listele)
             function listAircraft(aircraftId) {
             fetch(`/dashboard/api/aircraft/${aircraftId}/list/`, {
                 method: 'POST',
@@ -262,8 +262,8 @@
             })
             .then(response => response.json())
             .then(data => {
-                if (data.message === "Uçak başarıyla listeye alındı.") {
-                    alert("Uçak başarıyla listeye alındı.");
+                if (data.message === "Hava Aracı başarıyla listeye alındı.") {
+                    alert("Hava Aracı başarıyla listeye alındı.");
                     location.reload();  // Sayfayı yenileyerek değişiklikleri göster
                 } else {
                     alert("Bir hata oluştu.");
@@ -286,8 +286,8 @@
             })
             .then(response => response.json())
             .then(data => {
-                if (data.message === "Uçak başarıyla yayından kaldırıldı.") {
-                    alert("Uçak başarıyla yayından kaldırıldı.");
+                if (data.message === "Hava Aracı başarıyla yayından kaldırıldı.") {
+                    alert("Hava Aracı başarıyla yayından kaldırıldı.");
                     location.reload();  // Sayfayı yenileyerek değişiklikleri göster
                 } else {
                     alert("Bir hata oluştu.");
@@ -317,10 +317,10 @@
 
         //#region Hava Aracı üretme işlemi için fonksiyon
         function produceAircraft() {
-        const aircraftModelId = document.getElementById('aircraft-model-select').value;  // Uçak modelinin ID'si
+        const aircraftModelId = document.getElementById('aircraft-model-select').value;  // Hava Aracı modelinin ID'si
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');  // CSRF token
         console.log(aircraftModelId);
-        // Seçilen uçak modeline ait parçalar
+        // Seçilen Hava Aracı modeline ait parçalar
         const selectedParts = {
             'Kanat': ["TB2 Kanadı", "TB3 Kanadı", "AKINCI Kanadı", "KIZILELMA Kanadı"],
             'Gövde': ["TB2 Gövdesi", "TB3 Gövdesi", "AKINCI Gövdesi", "KIZILELMA Gövdesi"],
@@ -339,7 +339,7 @@
         console.log(producedParts);
         console.log(selectedParts);
 
-        // Uçak Üretim isteği gönderme
+        // Hava Aracı Üretim isteği gönderme
         fetch('http://localhost:8000/dashboard/api/aircraft-production/', {
         method: 'POST',
         headers: {
@@ -353,8 +353,8 @@
     })
         .then(response => response.json())
         .then(data => {
-            if (data.message === "Uçak başarıyla üretildi.") {
-                alert("Uçak başarıyla üretildi!");
+            if (data.message === "Hava Aracı başarıyla üretildi.") {
+                alert("Hava Aracı başarıyla üretildi!");
             } else if (data.missing_parts) {
                 // missing_parts kontrolü
                 const missingPartsMessage = data.missing_parts.length > 0
@@ -367,7 +367,7 @@
         })
         .catch(error => {
             console.error("Hata:", error);
-            alert("Uçak üretme işlemi sırasında bir hata oluştu.");
+            alert("Hava Aracı üretme işlemi sırasında bir hata oluştu.");
         });
         }
 
@@ -388,7 +388,7 @@
         })
         .then(response => response.json())
         .then(data => {
-            console.log(data);  // Burada data objesini konsola yazdırın
+            //console.log(data); 
         if (data.parts) {
             const partsList = data.parts;
             const partsUl = document.getElementById("parts-ul");
@@ -397,7 +397,6 @@
             // Parçaları listeye ekle
             partsList.forEach(part => {
                 const li = document.createElement("li");
-
                 // Quantity'ye göre background renk ayarla
                 if (part.quantity === 0) {
                     li.classList.add("list-group-item", "list-group-item-danger"); // light red
@@ -407,7 +406,7 @@
                     li.classList.add("list-group-item");
                 }
 
-                li.textContent = `${part.part_name} (${part.part_type}) - Uçak Modeli: ${part.aircraft_model}`;
+                li.textContent = `${part.part_name} (${part.part_type}) - Hava Aracı Modeli: ${part.aircraft_model}`;
 
                 // Silme butonu ekliyoruz
                 const deleteButton = document.createElement("button");
@@ -554,7 +553,7 @@
         const partName = document.getElementById('part_name').value;
         const aircraftModel = document.getElementById('aircraft_model').value;
         const teamId = document.getElementById('team-id-container').textContent.trim();
-        console.log(teamId);
+        //console.log(teamId);
 
         // JSON verisini oluştur
         const payload = {
@@ -563,7 +562,7 @@
             aircraft_model: aircraftModel,
             team_id: teamId
         };
-        console.log('Payload:', payload);
+        //console.log('Payload:', payload);
         fetch('/api/produce-part/', {
             method: 'POST',
             headers: {

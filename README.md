@@ -141,6 +141,9 @@ Bu projede Django ve PostgreSQL teknolojilerini daha önce kullanmamış olmam n
 ### *Dashboard 2*
 ![Dashboard 2](static/project-images/4.png)
 
+### *Dashboard 3*
+![Dashboard 3](static/project-images/7.png)
+
 ### *Giriş ve Kayıt Ol*
 ![Giriş ve Kayıt Ol](static/project-images/3.png)
 
