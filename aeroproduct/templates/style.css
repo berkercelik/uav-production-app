@@ -1,0 +1,7 @@
+.img-fluid {
+    max-width: 382px;  /* Maksimum genişlik */
+    max-height: 100px; /* Maksimum yükseklik */
+    width: 100%;       /* Genişliği orantılı olarak ayarla */
+    height: auto;      /* Yüksekliği orantılı olarak ayarla */
+    object-fit: cover; /* Görselin bozulmaması için, alanı dolduracak şekilde ölçeklendir */
+}

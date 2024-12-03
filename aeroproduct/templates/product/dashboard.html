@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Dashboard</title>
+        <!-- Bootstrap CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+        <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer></script>
+        <meta name="csrf-token" content="{{ csrf_token }}">
+        
+        <link rel="stylesheet" href="style.css">
+</head>
+<div id="team-info" data-team-id="{{ user.team.id }}"></div>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="/">Anasayfa</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="/dashboard/">Dashboard</a>
+                </li>                 
+            </ul>
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <form action="{% url 'logout' %}" method="post" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-sm">Çıkış Yap</button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<body>
+    
+    <div class="container mt-5">
+        <!-- Kullanıcı Karşılama Mesajı -->
+        <h1 class="text-center">Hoş Geldiniz, {{ request.user.username }}</h1>    
+    </div>
+    
+
+    <div class="container mt-5">
+    
+        <!-- Başarı mesajını göster -->
+        {% if success_message %}
+            <div class="alert alert-success" role="alert">
+                {{ success_message }}
+            </div>
+        {% endif %}
+    
+        <!-- Form -->
+        <form method="POST" action="" class="card p-4 shadow-sm" id="team-form">
+            {% csrf_token %}
+            
+            <!-- Takım Seçimi -->
+            <div class="mb-3">
+                <label for="team" class="form-label">Takım Seçin:</label>
+                <select name="team" id="team" class="form-select">
+                    {% for team in teams %}
+                        <option value="{{ team.id }}">{{ team.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+    
+            <div class="text-center">
+                <button type="submit" id="selectTeamButton" class="btn btn-primary w-50">
+                    Takım Seç
+                </button>
+            </div>
+        </form>
+    </div>
+
+
+    <div id="team-id-container" style="display: none;">{{ request.user.team_id }}</div>
+
+    <!-- Parça Üret -->
+    <div class="container mt-5">
+        <form id="produce-part-form" data-team-id="{{ team.id }}" class="p-4 border rounded shadow">
+            {% csrf_token %}
+            
+            <h3 class="text-center mb-4">Parça Üret</h3>
+
+            <!-- Parça Türü -->
+            <div class="mb-3">
+                <label for="part_type" class="form-label">Parça Türü</label>
+                <select id="part_type" name="part_type" class="form-select">
+                    <option value="">-- Seçiniz --</option>
+                    <option value="Kanat">Kanat</option>
+                    <option value="Gövde">Gövde</option>
+                    <option value="Kuyruk">Kuyruk</option>
+                    <option value="Aviyonik">Aviyonik</option>
+                </select>
+            </div>
+
+            <!-- Uçak Modeli -->
+            <div class="mb-3">
+                <label for="aircraft_model" class="form-label">Uçak Modeli</label>
+                <select id="aircraft_model" name="aircraft_model" class="form-select" disabled>
+                    <option value="">-- Seçiniz --</option>
+                    <option value="1">TB2</option>
+                    <option value="2">TB3</option>
+                    <option value="3">AKINCI</option>
+                    <option value="4">KIZILELMA</option>
+                </select>
+            </div>
+
+            <!-- Parça Adı -->
+            <div class="mb-3">
+                <label for="part_name" class="form-label">Parça Adı</label>
+                <select id="part_name" name="part_name" class="form-select" disabled>
+                </select>
+            </div>
+
+            <!-- Buton -->
+            <div class="text-center">
+                <input type="submit" id="produce-part-button" value="Parça Üret" class="btn btn-primary w-100">
+            </div>
+        </form>
+    </div>
+
+    
+   <div class="container mt-5">   
+        <div id="parts-list" class="mt-5">
+            {% csrf_token %}
+            <h3>Parçalar</h3>
+                <ul id="parts-ul" class="list-group">
+                </ul>        
+        </div>
+    </div>
+
+    <div class="container mt-5">
+        <div class="child w-100">
+            <!-- Uçak Modeli Seçim Bölümü -->
+            <div id="aircraft-selection">
+                <h3 class="mb-3">Uçak Modeli Seçin</h3>
+                <div class="form-group">
+                    <label for="aircraft-model-select">Hava Aracı Modeli</label>
+                    <select id="aircraft-model-select" class="form-control">
+                        <option value="1">TB2</option>
+                        <option value="2">TB3</option>
+                        <option value="3">AKINCI</option>
+                        <option value="4">KIZILELMA</option>
+                    </select>
+                </div>
+                <div class="mt-3">
+                    <button id="produce-aircraft-btn" class="btn btn-primary w-100">Hava Aracı Üret</button>
+                </div>
+            </div>
+            
+            <!-- Uçak Listesi -->
+            <div id="aircraft-list" class="mt-5 row">
+                <div class="col-12">
+                    <h4 class="mb-3">Uçaklar</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+      
+
+    <footer class="blockquote-footer"><cite title="Source Title">Hava Aracı Üretim Uygulaması</cite></footer>    
+</body>
+    <script>       
+        //#region Team-info aircraft-selection
+        document.addEventListener("DOMContentLoaded", function () {
+        const teamInfoDiv = document.getElementById("team-info");
+        const userTeamId = parseInt(teamInfoDiv.getAttribute("data-team-id")); // Takım ID'sini al
+
+        const aircraftProductionDiv = document.getElementById("aircraft-selection");
+        const aircraftListDiv = document.getElementById("aircraft-list"); // Uçakların listeleneceği div
+        //#endregion
+    
+        //#region Montaj Takımı için Hava Aracı Listeleme
+        
+        // Eğer kullanıcı id'si 5 (montaj takımı) değilse, üretim butonunu ve uçak listesine dair her şeyi gizle
+        if (userTeamId !== 5) {
+            aircraftProductionDiv.style.display = "none";
+            aircraftListDiv.style.display = "none"; // Eğer montaj takımı değilse listeyi gizle
+        } else {
+            // CSRF token al
+            function getCSRFToken() {
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            return csrfToken;
+            }
+            // Kullanıcı montaj takımıysa, uçakları listele
+            fetch('/dashboard/api/aircraft/')
+        .then(response => response.json())
+        .then(data => {
+            const aircraftListDiv = document.getElementById("aircraft-list"); // Uçakların listeleneceği div
+
+            if (data.assemblies && data.assemblies.length > 0) {
+                data.assemblies.forEach(assembly => {
+                    // Bootstrap kart tasarımı
+                    const aircraftItem = `
+                        <div class="col-md-4 mb-4">
+                            <div class="card shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title">${assembly.aircraft_model}</h5>
+                                    <p class="card-text">
+                                        <strong>Üretim Tarihi:</strong> ${new Date(assembly.assembly_date).toLocaleString()}
+                                    </p>
+                                    <ul class="list-group list-group-flush mb-3">
+                                        ${assembly.parts.map(part => `<li class="list-group-item">${part.part_name}</li>`).join('')}
+                                    </ul>
+                                    ${
+                                        assembly.is_listed
+                                            ? `<button class="btn btn-danger w-100 remove-aircraft" data-id="${assembly.id}">Yayından Kaldır</button>`
+                                            : `<button class="btn btn-primary w-100 list-aircraft" data-id="${assembly.id}">Listele</button>`
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    // Listeyi ekle
+                    aircraftListDiv.innerHTML += aircraftItem;
+                });
+
+                // Listele ve yayından kaldırma işlemleri
+                document.querySelectorAll(".list-aircraft").forEach(button => {
+                    button.addEventListener("click", function () {
+                        listAircraft(this.dataset.id);
+                    });
+                });
+
+                document.querySelectorAll(".remove-aircraft").forEach(button => {
+                    button.addEventListener("click", function () {
+                        removeAircraft(this.dataset.id);
+                    });
+                });
+            } else {
+                aircraftListDiv.innerHTML = `
+                    <div class="col-12 text-center">
+                        <p class="text-muted">Henüz üretilen uçak yok.</p>
+                    </div>
+                `;
+            }
+        })
+        .catch(error => {
+            console.error("Uçakları getirirken bir hata oluştu:", error);
+            aircraftListDiv.innerHTML = `
+                <div class="col-12 text-center">
+                    <p class="text-danger">Uçaklar listelenemedi. Lütfen tekrar deneyin.</p>
+                </div>
+            `;
+        });
+    }
+                
+            });
+
+            // Uçak listeleme işlemi (backend ile iletişim kurarak uçakları listele)
+            function listAircraft(aircraftId) {
+            fetch(`/dashboard/api/aircraft/${aircraftId}/list/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken()  // CSRF token'ı gereklidir
+                },
+                body: JSON.stringify({ aircraft_id: aircraftId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message === "Uçak başarıyla listeye alındı.") {
+                    alert("Uçak başarıyla listeye alındı.");
+                    location.reload();  // Sayfayı yenileyerek değişiklikleri göster
+                } else {
+                    alert("Bir hata oluştu.");
+                }
+            })
+            .catch(error => {
+                console.error("Listeleme işlemi sırasında hata:", error);
+            });
+            }
+
+            // Yayından kaldırma işlemi
+            function removeAircraft(aircraftId) {
+            fetch(`/dashboard/api/aircraft/${aircraftId}/remove/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken()  // CSRF token
+                },
+                body: JSON.stringify({ aircraft_id: aircraftId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message === "Uçak başarıyla yayından kaldırıldı.") {
+                    alert("Uçak başarıyla yayından kaldırıldı.");
+                    location.reload();  // Sayfayı yenileyerek değişiklikleri göster
+                } else {
+                    alert("Bir hata oluştu.");
+                }
+            })
+            .catch(error => {
+                console.error("Yayından kaldırma işlemi sırasında hata:", error);
+            });
+            }
+
+            // CSRF token al
+            function getCSRFToken() {
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                return csrfToken;
+            }
+    //#endregion
+
+        //#region Kullanıcı Takım Kontrolü
+        document.addEventListener("DOMContentLoaded", function () {
+        const teamInfoDiv = document.getElementById("team-info");
+        const userTeamId = parseInt(teamInfoDiv.getAttribute("data-team-id")); // Takım ID'sini al
+
+        const aircraftProductionDiv = document.getElementById("aircraft-selection");
+
+        });
+        //#endregion
+
+        //#region Hava Aracı üretme işlemi için fonksiyon
+        function produceAircraft() {
+        const aircraftModelId = document.getElementById('aircraft-model-select').value;  // Uçak modelinin ID'si
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');  // CSRF token
+        console.log(aircraftModelId);
+        // Seçilen uçak modeline ait parçalar
+        const selectedParts = {
+            'Kanat': ["TB2 Kanadı", "TB3 Kanadı", "AKINCI Kanadı", "KIZILELMA Kanadı"],
+            'Gövde': ["TB2 Gövdesi", "TB3 Gövdesi", "AKINCI Gövdesi", "KIZILELMA Gövdesi"],
+            'Kuyruk': ["TB2 Kuyruğu", "TB3 Kuyruğu", "AKINCI Kuyruğu", "KIZILELMA Kuyruğu"],
+            'Aviyonik': ["TB2 Aviyonik", "TB3 Aviyonik", "AKINCI Aviyonik", "KIZILELMA Aviyonik"]
+        };
+
+        // Üretilen parçaları al
+        const producedParts = [];
+        Object.keys(selectedParts).forEach(partType => {
+            const part = selectedParts[partType];
+            part.forEach(partName => {
+                producedParts.push(partName);
+            });
+        });
+        console.log(producedParts);
+        console.log(selectedParts);
+
+        // Uçak Üretim isteği gönderme
+        fetch('http://localhost:8000/dashboard/api/aircraft-production/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            aircraft_model_id: aircraftModelId,
+            produced_parts: producedParts
+        })
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message === "Uçak başarıyla üretildi.") {
+                alert("Uçak başarıyla üretildi!");
+            } else if (data.missing_parts) {
+                // missing_parts kontrolü
+                const missingPartsMessage = data.missing_parts.length > 0
+                    ? `Eksik parçalar: ${data.missing_parts.join(', ')}`
+                    : "Eksik parça bilgisi alınamadı.";
+                alert(missingPartsMessage);
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => {
+            console.error("Hata:", error);
+            alert("Uçak üretme işlemi sırasında bir hata oluştu.");
+        });
+        }
+
+        document.getElementById('produce-aircraft-btn').addEventListener('click', produceAircraft);
+    //#endregion
+        
+        //#region Parça Listeleme
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        const teamId = document.getElementById('team-id-container').textContent.trim();
+        console.log(teamId);
+
+        fetch(`http://localhost:8000/dashboard/api/parts/?team_id=${teamId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);  // Burada data objesini konsola yazdırın
+        if (data.parts) {
+            const partsList = data.parts;
+            const partsUl = document.getElementById("parts-ul");
+            partsUl.innerHTML = "";  // Önceden var olan listeyi temizle
+
+            // Parçaları listeye ekle
+            partsList.forEach(part => {
+                const li = document.createElement("li");
+
+                // Quantity'ye göre background renk ayarla
+                if (part.quantity === 0) {
+                    li.classList.add("list-group-item", "list-group-item-danger"); // light red
+                } else if (part.quantity === 1) {
+                    li.classList.add("list-group-item", "list-group-item-success"); // light green
+                } else {
+                    li.classList.add("list-group-item");
+                }
+
+                li.textContent = `${part.part_name} (${part.part_type}) - Uçak Modeli: ${part.aircraft_model}`;
+
+                // Silme butonu ekliyoruz
+                const deleteButton = document.createElement("button");
+                deleteButton.textContent = "Sil";
+                deleteButton.classList.add("btn", "btn-danger", "btn-sm", "float-right");
+                deleteButton.style.marginLeft = "10px";
+                deleteButton.onclick = function() {
+                    deletePart(part.id);  // Silme fonksiyonunu çağırıyoruz
+                };
+
+                li.appendChild(deleteButton);
+                partsUl.appendChild(li);
+            });
+            } else {
+                console.error("Parçalar bulunamadı:", data.message);  // Eğer parçalar yoksa mesajı yazdır
+                // Sayfa üzerinde kullanıcıya mesaj gösterme
+                const messageDiv = document.createElement("div");  
+                messageDiv.classList.add("alert", "alert-warning");  
+                messageDiv.innerHTML = "Parçalar bulunamadı."; 
+
+                const partsListDiv = document.getElementById("parts-ul");
+                partsListDiv.insertBefore(messageDiv, partsListDiv.firstChild);
+                }
+            })
+            .catch(error => {
+                console.error("Parçalar listeleme hatası:", error);
+            });
+        //#endregion
+
+        //#region Parça Silme        
+
+        function deletePart(partId) {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');  // CSRF token'ı al
+
+        fetch(`http://localhost:8000/dashboard/api/parts/${partId}/`, {
+            method: 'DELETE',  // DELETE metodu
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken  // CSRF token'ı ekliyoruz
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message === "Parça başarıyla silindi.") {
+                alert("Parça başarıyla silindi!");
+                location.reload();  // Sayfayı yeniden yükleyerek listeyi güncelliyoruz
+            } else {
+                alert("Silme işlemi başarısız oldu: " + data.message);
+            }
+        })
+        .catch(error => {
+            console.error("Silme işlemi hatası:", error);
+            alert("Silme işlemi sırasında bir hata oluştu.");
+        });
+        }        
+        //#endregion
+        
+        //#region Parça Üretim Bölümü
+
+        // Parça türüne göre parça isimlerini tanımlıyoruz
+        const partOptions = {
+            "Kanat": [
+                "TB2 Kanadı",
+                "TB3 Kanadı",
+                "AKINCI Kanadı",
+                "KIZILELMA Kanadı"
+            ],
+            "Gövde": [
+                "TB2 Gövdesi",
+                "TB3 Gövdesi",
+                "AKINCI Gövdesi",
+                "KIZILELMA Gövdesi"
+            ],
+            "Kuyruk": [
+                "TB2 Kuyruğu",
+                "TB3 Kuyruğu",
+                "AKINCI Kuyruğu",
+                "KIZILELMA Kuyruğu"
+            ],
+            "Aviyonik": [
+                "TB2 Aviyonik",
+                "TB3 Aviyonik",
+                "AKINCI Aviyonik",
+                "KIZILELMA Aviyonik"
+            ]
+        };
+
+        // Seçim elementlerini al
+        const partTypeSelect = document.getElementById('part_type');
+        const aircraftModelSelect = document.getElementById('aircraft_model');
+        const partNameSelect = document.getElementById('part_name');
+
+        updatePartList(document.getElementById('part_type').value);
+
+        // Part_type seçildiğinde aircraft_model etkinleştir ve sıfırla
+        partTypeSelect.addEventListener('change', () => {
+            const partType = partTypeSelect.value;
+
+            aircraftModelSelect.value = '';  // Modeli sıfırlıyoruz
+            aircraftModelSelect.disabled = !partType;  // Parça türü seçildiyse etkinleştir
+
+            partNameSelect.disabled = true;
+            partNameSelect.innerHTML = '<option value="">-- Seçiniz --</option>';
+
+            updatePartList(partType);
+        });
+
+        // Aircraft model seçildiğinde part name'i doldur
+        aircraftModelSelect.addEventListener('change', () => {
+            const partType = partTypeSelect.value;
+            const aircraftModelIndex = aircraftModelSelect.selectedIndex - 1;
+
+            if (partType && aircraftModelIndex >= 0) {
+                // Parça adlarını yükle
+                const partNames = partOptions[partType];
+                const selectedPartName = partNames[aircraftModelIndex];
+
+                partNameSelect.innerHTML = `<option value="${selectedPartName}">${selectedPartName}</option>`;
+                partNameSelect.disabled = false;
+            } else {
+                partNameSelect.disabled = true;
+                partNameSelect.innerHTML = '<option value="">-- Seçiniz --</option>';
+            }
+        });
+
+        // Parça listelerini güncelleyen fonksiyon
+        function updatePartList(partType) {
+            const partSelect = document.getElementById('part_name');
+            partSelect.innerHTML = '';  // Mevcut seçenekleri temizle
+
+            // Parça türüne göre uygun parçaları listele
+            const parts = partOptions[partType] || [];
+            parts.forEach(part => {
+                const option = document.createElement('option');
+                option.value = part;
+                option.textContent = part;
+                partSelect.appendChild(option);
+            });
+        }
+
+        function sendSelectedPart() {
+        // Seçilen değerleri al
+        const partType = document.getElementById('part_type').value;
+        const partName = document.getElementById('part_name').value;
+        const aircraftModel = document.getElementById('aircraft_model').value;
+        const teamId = document.getElementById('team-id-container').textContent.trim();
+        console.log(teamId);
+
+        // JSON verisini oluştur
+        const payload = {
+            part_type: partType,
+            part_name: partName,
+            aircraft_model: aircraftModel,
+            team_id: teamId
+        };
+        console.log('Payload:', payload);
+        fetch('/api/produce-part/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken // CSRF token'ı ekle
+            },
+            body: JSON.stringify(payload) // JSON verisini gönder
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Bu takım bu parçayı üretemez. Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('API Response:', data);
+            alert(data.message); // Sunucudan gelen mesajı göster
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Bu takım bu parçayı üretemez!');
+        });
+        }
+
+        // "Parça Üret" butonuna tıklama
+        document.getElementById('produce-part-button').addEventListener('click', function(event) {
+            event.preventDefault(); // Formun varsayılan gönderimini engelle
+            sendSelectedPart(); // Fonksiyonu çağır
+        });
+
+        //#endregion
+
+    </script>
+</html>

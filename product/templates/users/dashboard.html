@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+</head>
+<body>
+    <h1>Welcome back, {{ user.username }}!</h1>
+    <p>This is your personalized dashboard.</p>
+    
+    {% if user_profile.team %}
+    <p>Seçtiğiniz Takım: {{ user_profile.team.name }}</p>
+        {% else %}
+    <p>Bir takım seçin:</p>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Takım Seç</button>
+    </form>
+        {% endif %}
+
+
+    <form action="{% url 'logout' %}" method="post">
+        {% csrf_token %}
+        <button type="submit">Logout</button>
+    </form>
+</body>
+</html>
