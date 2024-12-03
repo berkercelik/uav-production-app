@@ -96,9 +96,9 @@ Bu projede Django ve PostgreSQL teknolojilerini daha önce kullanmamış olmam n
 
 ## *Kurulum Talimatları*
 1. Projeyi klonlayın:
-   bash
+   ```
    git clone https://github.com/berkercelik/uav-production-app.git
-   
+   ```
 2. Sanal bir ortam oluşturun ve aktif hale getirin:
    ```
    python -m venv env   
@@ -106,10 +106,10 @@ Bu projede Django ve PostgreSQL teknolojilerini daha önce kullanmamış olmam n
    ```
 3. Gereksinimleri yükleyin:
    ```
-   pip install environ django-cors-headers
+   pip install environ django-cors-headers psycopg psycopg2-binary
    ```
    ```
-   pip install djangorestframework markdown django-filter
+   pip install djangorestframework markdown django-filter 
    ```
    
 4. Veritabanını oluşturun ve migrate işlemini yapın:
