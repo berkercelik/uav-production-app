@@ -40,21 +40,18 @@
 <body>
     
     <div class="container mt-5">
-        <!-- Kullanıcı Karşılama Mesajı -->
         <h1 class="text-center">Hoş Geldiniz, {{ request.user.username }}</h1>    
     </div>
     
 
     <div class="container mt-5">
     
-        <!-- Başarı mesajını göster -->
         {% if success_message %}
             <div class="alert alert-success" role="alert">
                 {{ success_message }}
             </div>
         {% endif %}
     
-        <!-- Form -->
         <form method="POST" action="" class="card p-4 shadow-sm" id="team-form">
             {% csrf_token %}
             
